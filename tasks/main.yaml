@@ -1,0 +1,33 @@
+- name: Install
+  ansible.builtin.apt:
+    name:
+      - exa
+    state: present
+  become: true
+
+- name: Set fact
+  ansible.builtin.set_fact:
+    exa_aliases: |
+      alias ls='exa'
+      alias l='exa --all --oneline --group-directories-first'    
+      alias ll='exa --all --long --time-style=long-iso --links --classify --color-scale --group-directories-first'
+      alias lx='exa -lbhHigUmuSa@ --time-style=long-iso --color-scale'
+      alias lt='exa --all --tree --group-directories-first'
+
+- name: "bash : Add aliases"
+  blockinfile:
+    path: "{{ bash_bashrc_middle }}"
+    insertafter: EOF
+    state: present
+    marker: "# {mark} :: ANSIBLE MANAGED BLOCK :: {{ role_name }}"
+    block: |
+      {{ exa_aliases }}
+
+- name: "zsh : Add aliases"
+  blockinfile:
+    path: "{{ zsh_zshrc_middle }}"
+    insertafter: EOF
+    state: present
+    marker: "# {mark} :: ANSIBLE MANAGED BLOCK :: {{ role_name }}"
+    block: |
+      {{ exa_aliases }}
